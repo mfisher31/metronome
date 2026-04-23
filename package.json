@@ -6,7 +6,7 @@
     "build:wasm": "cargo build -p metronome-web --target wasm32-unknown-unknown --profile release-wasm && cp ./target/wasm32-unknown-unknown/release-wasm/metronome_web.wasm public/",
     "dev": "npm run build:wasm && vite",
     "build": "npm run build:wasm && vite build",
-    "preview": "vite preview"
+    "start": "vite preview"
   },
   "devDependencies": {
     "vite": "^5.4.0"
