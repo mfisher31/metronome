@@ -1,0 +1,13 @@
+# Rust
+/target/
+
+# Node / Vite
+node_modules/
+dist/
+.vite/
+
+# Generated WASM artifact (built by npm run build:wasm)
+public/metronome_web.wasm
+
+# macOS
+.DS_Store

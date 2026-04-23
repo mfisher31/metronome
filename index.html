@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Metronome</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #111;
+      --surface:   #1e1e1e;
+      --border:    #333;
+      --accent:    #f5a623;
+      --accent-hi: #ffc85a;
+      --beat:      #2a2a2a;
+      --beat-on:   var(--accent);
+      --text:      #e0e0e0;
+      --muted:     #888;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 48px;
+      width: min(480px, 94vw);
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    /* ---- BPM display ---- */
+    .bpm-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    #bpm-number {
+      font-size: 5rem;
+      font-weight: 700;
+      width: 5ch;
+      text-align: center;
+      background: transparent;
+      border: none;
+      color: var(--accent);
+      outline: none;
+      /* hide spin buttons */
+      -moz-appearance: textfield;
+    }
+    #bpm-number::-webkit-outer-spin-button,
+    #bpm-number::-webkit-inner-spin-button { display: none; }
+
+    .bpm-label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      align-self: flex-end;
+      padding-bottom: 0.6rem;
+    }
+
+    /* ---- Beat dots ---- */
+    #beat-dots {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--beat);
+      border: 2px solid var(--border);
+      transition: background 60ms ease, border-color 60ms ease;
+    }
+    .dot.accent { border-color: var(--accent); }
+    .dot.active  { background: var(--beat-on); border-color: var(--accent-hi); }
+
+    /* ---- Controls ---- */
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      min-width: 80px;
+    }
+
+    input[type=range] {
+      flex: 1;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    select {
+      flex: 1;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    /* ---- Buttons ---- */
+    .buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    button {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: opacity 0.15s;
+    }
+    button:active { opacity: 0.8; }
+
+    #btn-start {
+      background: var(--accent);
+      color: #111;
+    }
+    #btn-tap {
+      background: var(--border);
+      color: var(--text);
+    }
+
+    /* ---- Accent toggle ---- */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    input[type=checkbox] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+
+    <!-- BPM display -->
+    <div class="bpm-row">
+      <input id="bpm-number" type="number" min="20" max="300" value="120" />
+      <span class="bpm-label">BPM</span>
+    </div>
+
+    <!-- Beat indicator -->
+    <div id="beat-dots"></div>
+
+    <!-- Controls -->
+    <div class="controls">
+
+      <div class="row">
+        <label for="bpm-slider">Tempo</label>
+        <input id="bpm-slider" type="range" min="20" max="300" value="120" />
+      </div>
+
+      <div class="row">
+        <label for="beats-per-bar">Meter</label>
+        <select id="beats-per-bar">
+          <option value="2">2/4</option>
+          <option value="3">3/4</option>
+          <option value="4" selected>4/4</option>
+          <option value="5">5/4</option>
+          <option value="6">6/8</option>
+          <option value="7">7/8</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <label for="gain-slider">Volume</label>
+        <input id="gain-slider" type="range" min="0" max="1" step="0.01" value="1" />
+      </div>
+
+      <div class="toggle-row">
+        <input id="accent-toggle" type="checkbox" checked />
+        <label for="accent-toggle" style="min-width:unset">Accent beat 1</label>
+      </div>
+
+    </div>
+
+    <!-- Action buttons -->
+    <div class="buttons">
+      <button id="btn-start">Start</button>
+      <button id="btn-tap">Tap (Space)</button>
+    </div>
+
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

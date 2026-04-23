@@ -1,0 +1,4 @@
+# Export WASM linear memory so JS can create typed array views into it.
+# Without this, wasm.memory is undefined in the AudioWorklet.
+[target.wasm32-unknown-unknown]
+rustflags = ["-C", "link-arg=--export-memory"]

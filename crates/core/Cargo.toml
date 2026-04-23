@@ -1,0 +1,6 @@
+[package]
+name = "metronome-core"
+version = "0.1.0"
+edition = "2021"
+
+# No dependencies — pure DSP, compiles to any target (native + wasm32)
