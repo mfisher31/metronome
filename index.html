@@ -25,8 +25,43 @@
       font-family: 'SF Mono', 'Fira Code', monospace;
       min-height: 100dvh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 24px;
+      padding: 40px 16px;
+    }
+
+    h1 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .about {
+      width: min(480px, 94vw);
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.7;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .about a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .about a:hover { text-decoration: underline; }
+    .stack { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
     }
 
     .card {
@@ -175,6 +210,7 @@
   </style>
 </head>
 <body>
+  <h1>Metronome</h1>
   <div class="card">
 
     <!-- BPM display -->
@@ -224,6 +260,22 @@
       <button id="btn-tap">Tap (Space)</button>
     </div>
 
+  </div>
+
+  <div class="about">
+    <div class="stack">
+      <span class="chip">Rust</span>
+      <span class="chip">WebAssembly</span>
+      <span class="chip">AudioWorklet</span>
+      <span class="chip">Vite</span>
+    </div>
+    <span>
+      Sample-accurate DSP in Rust, compiled to WASM and run directly on the browser audio thread via AudioWorklet.
+      Zero JS scheduling — all timing is handled by a phase accumulator in Rust.
+    </span>
+    <span>
+      <a href="https://github.com/mfisher31/metronome" target="_blank" rel="noopener">github.com/mfisher31/metronome</a>
+    </span>
   </div>
 
   <script type="module" src="/src/main.js"></script>
