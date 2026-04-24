@@ -21,7 +21,16 @@ docker run --rm -p 8080:8080 metronome
 
 Open http://localhost:8080.
 
-## Dev (without Docker)
+## Run from GitHub Container Registry
+
+```bash
+docker pull ghcr.io/mfisher31/metronome:latest
+docker run --rm -p 8080:8080 ghcr.io/mfisher31/metronome:latest
+```
+
+Open http://localhost:8080.
+
+## Development (without Docker)
 
 **Prerequisites:** Rust, `wasm32-unknown-unknown` target, Node 20+
 
@@ -30,3 +39,7 @@ rustup target add wasm32-unknown-unknown
 npm install
 npm run dev
 ```
+
+## License
+
+MIT — see [LICENSE](LICENSE).
