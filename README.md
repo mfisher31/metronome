@@ -1,3 +1,5 @@
+[![Build](https://github.com/mfisher31/metronome/actions/workflows/build.yml/badge.svg)](https://github.com/mfisher31/metronome/actions/workflows/build.yml)
+
 # Metronome
 
 A browser-based metronome with DSP written in Rust and compiled to WebAssembly.
