@@ -10,6 +10,13 @@
 // State
 // ---------------------------------------------------------------------------
 
+// Pre-fetch WASM once at page load — no user gesture required for fetch.
+// Compile + instantiate happens inside the AudioWorklet on first Start.
+const wasmReady = fetch('/metronome_web.wasm').then((r) => {
+  if (!r.ok) throw new Error(`WASM fetch failed: ${r.status}`);
+  return r.arrayBuffer();
+});
+
 let audioCtx   = null;
 let workletNode = null;
 let running    = false;
@@ -24,67 +31,36 @@ const tapTimes = [];
 const TAP_WINDOW_MS = 3000; // reset tap buffer after 3 s of silence
 
 // ---------------------------------------------------------------------------
-// AudioWorklet setup (called once on first Start press)
+// AudioWorklet setup — called once on first Start press
 // ---------------------------------------------------------------------------
 
-async function startAudio() {
-  try {
-    audioCtx = new AudioContext();
+async function initAudio() {
+  audioCtx = new AudioContext();
+  if (audioCtx.state === 'suspended') await audioCtx.resume();
 
-    if (audioCtx.state === 'suspended') {
-      await audioCtx.resume();
+  await audioCtx.audioWorklet.addModule('/worklet.js');
+
+  workletNode = new AudioWorkletNode(audioCtx, 'metronome-processor', {
+    numberOfOutputs: 1,
+    outputChannelCount: [2],
+  });
+
+  workletNode.port.onmessage = (e) => {
+    if (e.data.type === 'ready') {
+      // Engine compiled and running — send params then start ticking.
+      sendAll();
+      send({ type: 'start' });
+      running = true;
+      document.getElementById('btn-start').textContent = 'Stop';
     }
-    console.log('[metro] AudioContext state:', audioCtx.state, 'sampleRate:', audioCtx.sampleRate);
+    if (e.data.type === 'beat') flashBeat(e.data.beatIndex);
+    if (e.data.type === 'error') console.error('[metro] worklet error:', e.data.message);
+  };
 
-    console.log('[metro] loading worklet module...');
-    await audioCtx.audioWorklet.addModule('/worklet.js');
-    console.log('[metro] worklet module loaded');
-
-    console.log('[metro] fetching WASM...');
-    const wasmResp = await fetch('/metronome_web.wasm');
-    if (!wasmResp.ok) throw new Error(`WASM fetch failed: ${wasmResp.status}`);
-    const wasmBuf = await wasmResp.arrayBuffer();
-    console.log('[metro] WASM fetched, sending bytes to worklet');
-
-    workletNode = new AudioWorkletNode(audioCtx, 'metronome-processor', {
-      numberOfOutputs: 1,
-      outputChannelCount: [2],
-    });
-
-    workletNode.port.onmessage = (e) => {
-      if (e.data.type === 'ready') {
-        console.log('[metro] worklet ready — sending params');
-        sendAll();
-      }
-      if (e.data.type === 'beat') {
-        flashBeat(e.data.beatIndex);
-      }
-      if (e.data.type === 'error') {
-        console.error('[metro] worklet error:', e.data.message);
-      }
-    };
-
-    // Transfer the ArrayBuffer (zero-copy move) to the worklet.
-    // Sending a compiled WebAssembly.Module to an AudioWorklet is unreliable
-    // across browsers — raw bytes are always safe.
-    workletNode.port.postMessage({ type: 'init', wasmBuf }, [wasmBuf]);
-    workletNode.connect(audioCtx.destination);
-    console.log('[metro] workletNode connected');
-  } catch (err) {
-    console.error('[metro] startAudio FAILED:', err);
-  }
-}
-
-async function stopAudio() {
-  if (workletNode) {
-    workletNode.port.postMessage({ type: 'reset' });
-    workletNode.disconnect();
-    workletNode = null;
-  }
-  if (audioCtx) {
-    await audioCtx.close();
-    audioCtx = null;
-  }
+  // WASM was pre-fetched — transfer the already-downloaded bytes (zero-copy).
+  const wasmBuf = await wasmReady;
+  workletNode.port.postMessage({ type: 'init', wasmBuf }, [wasmBuf]);
+  workletNode.connect(audioCtx.destination);
 }
 
 // ---------------------------------------------------------------------------
@@ -114,7 +90,7 @@ function buildBeatDots(n) {
   beatDots = [];
   for (let i = 0; i < n; i++) {
     const dot = document.createElement('div');
-    dot.className = 'dot' + (i === 0 ? ' accent' : '');
+    dot.className = 'metro-dot' + (i === 0 ? ' metro-accent' : '');
     container.appendChild(dot);
     beatDots.push(dot);
   }
@@ -123,11 +99,11 @@ function buildBeatDots(n) {
 let flashTimeout = null;
 
 function flashBeat(index) {
-  beatDots.forEach((d, i) => d.classList.toggle('active', i === index));
+  beatDots.forEach((d, i) => d.classList.toggle('metro-active', i === index));
   clearTimeout(flashTimeout);
   // Auto-clear after ~100 ms so the flash is visible even at fast tempos
   flashTimeout = setTimeout(() => {
-    beatDots.forEach((d) => d.classList.remove('active'));
+    beatDots.forEach((d) => d.classList.remove('metro-active'));
   }, 100);
 }
 
@@ -174,13 +150,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Start / Stop
   document.getElementById('btn-start').addEventListener('click', async () => {
-    if (running) {
-      await stopAudio();
+    if (!workletNode) {
+      // First press — initialize the audio graph and load WASM.
+      // UI update happens in the 'ready' message handler.
+      await initAudio();
+    } else if (running) {
+      send({ type: 'stop' });
       running = false;
       document.getElementById('btn-start').textContent = 'Start';
-      beatDots.forEach((d) => d.classList.remove('active'));
+      beatDots.forEach((d) => d.classList.remove('metro-active'));
     } else {
-      await startAudio();
+      if (audioCtx.state === 'suspended') await audioCtx.resume();
+      sendAll();
+      send({ type: 'start' });
       running = true;
       document.getElementById('btn-start').textContent = 'Stop';
     }

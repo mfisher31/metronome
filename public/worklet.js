@@ -11,8 +11,9 @@ const NO_BEAT = 0xFF;
 class MetronomeProcessor extends AudioWorkletProcessor {
   constructor() {
     super();
-    this._wasm = null;
-    this._ptr  = 0;
+    this._wasm    = null;
+    this._ptr     = 0;
+    this._running = false;
     this.port.onmessage = (e) => this._handleMessage(e.data);
   }
 
@@ -40,7 +41,9 @@ class MetronomeProcessor extends AudioWorkletProcessor {
         case 'set_beats_per_bar': this._wasm?.engine_set_beats_per_bar(this._ptr, msg.value); break;
         case 'set_gain':          this._wasm?.engine_set_gain(this._ptr, msg.value); break;
         case 'set_accent':        this._wasm?.engine_set_accent(this._ptr, msg.value ? 1 : 0); break;
-        case 'reset':             this._wasm?.engine_reset(this._ptr); break;
+        case 'start':             this._running = true; break;
+        case 'stop':              this._running = false; this._wasm?.engine_reset(this._ptr); break;
+        case 'reset':             this._running = false; this._wasm?.engine_reset(this._ptr); break;
       }
     } catch (err) {
       console.error('[worklet] init error:', err);
@@ -54,6 +57,12 @@ class MetronomeProcessor extends AudioWorkletProcessor {
     const outL = outputs[0]?.[0];
     const outR = outputs[0]?.[1];
     if (!outL) return true;
+
+    if (!this._running) {
+      outL.fill(0);
+      if (outR) outR.fill(0);
+      return true;
+    }
 
     // Run the full 128-sample block in WASM — phase accumulator + click synth.
     // Returns the beat index that fired this block, or 0xFF if none.
