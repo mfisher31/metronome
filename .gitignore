@@ -11,3 +11,6 @@ public/metronome_web.wasm
 
 # macOS
 .DS_Store
+
+*_key
+*_key.pub
