@@ -42,7 +42,7 @@ jobs:
           ssh -i ~/.ssh/key -p "${{ secrets.DEPLOY_PORT || 22 }}" \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" bash <<'EOF'
           set -eu
-          cd /opt/myapp
+          cd /opt/app
           docker compose pull
           docker compose up -d
           docker image prune -f
