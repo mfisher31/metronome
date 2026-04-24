@@ -1,0 +1,203 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --metro-bg:        #111;
+  --metro-surface:   #1e1e1e;
+  --metro-border:    #333;
+  --metro-accent:    #f5a623;
+  --metro-accent-hi: #ffc85a;
+  --metro-beat:      #2a2a2a;
+  --metro-beat-on:   var(--metro-accent);
+  --metro-text:      #e0e0e0;
+  --metro-muted:     #888;
+}
+
+body {
+  background: var(--metro-bg);
+  color: var(--metro-text);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 40px 16px;
+}
+
+h1 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--metro-accent);
+}
+
+.metro-about {
+  width: min(480px, 94vw);
+  font-size: 0.78rem;
+  color: var(--metro-muted);
+  line-height: 1.7;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.metro-about a {
+  color: var(--metro-accent);
+  text-decoration: none;
+}
+.metro-about a:hover { text-decoration: underline; }
+
+.metro-stack { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.metro-chip {
+  background: var(--metro-surface);
+  border: 1px solid var(--metro-border);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+}
+
+.metro-card {
+  background: var(--metro-surface);
+  border: 1px solid var(--metro-border);
+  border-radius: 16px;
+  padding: 40px 48px;
+  width: min(480px, 94vw);
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* ---- BPM display ---- */
+.metro-bpm-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+#bpm-number {
+  font-size: 5rem;
+  font-weight: 700;
+  width: 5ch;
+  text-align: center;
+  background: transparent;
+  border: none;
+  color: var(--metro-accent);
+  outline: none;
+  -moz-appearance: textfield;
+}
+#bpm-number::-webkit-outer-spin-button,
+#bpm-number::-webkit-inner-spin-button { display: none; }
+
+.metro-bpm-label {
+  font-size: 0.85rem;
+  color: var(--metro-muted);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  align-self: flex-end;
+  padding-bottom: 0.6rem;
+}
+
+/* ---- Beat dots ---- */
+#beat-dots {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.metro-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--metro-beat);
+  border: 2px solid var(--metro-border);
+  transition: background 60ms ease, border-color 60ms ease;
+}
+.metro-dot.metro-accent { border-color: var(--metro-accent); }
+.metro-dot.metro-active { background: var(--metro-beat-on); border-color: var(--metro-accent-hi); }
+
+/* ---- Controls ---- */
+.metro-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.metro-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+label {
+  font-size: 0.75rem;
+  color: var(--metro-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  min-width: 80px;
+}
+
+input[type=range] {
+  flex: 1;
+  accent-color: var(--metro-accent);
+  cursor: pointer;
+}
+
+select {
+  flex: 1;
+  background: var(--metro-bg);
+  color: var(--metro-text);
+  border: 1px solid var(--metro-border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+/* ---- Buttons ---- */
+.metro-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+button {
+  flex: 1;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: opacity 0.15s;
+}
+button:active { opacity: 0.8; }
+
+#btn-start {
+  background: var(--metro-accent);
+  color: #111;
+}
+#btn-tap {
+  background: var(--metro-border);
+  color: var(--metro-text);
+}
+
+/* ---- Accent toggle ---- */
+.metro-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+input[type=checkbox] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--metro-accent);
+  cursor: pointer;
+}

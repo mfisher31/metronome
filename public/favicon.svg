@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Body: classic metronome trapezoid -->
+  <polygon points="8,28 24,28 20,6 12,6" fill="#1e1e1e" stroke="#f5a623" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- Base bar -->
+  <rect x="6" y="27" width="20" height="3" rx="1" fill="#f5a623"/>
+  <!-- Pendulum arm -->
+  <line x1="16" y1="26" x2="22" y2="10" stroke="#ffc85a" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Pivot dot -->
+  <circle cx="16" cy="26" r="1.5" fill="#f5a623"/>
+  <!-- Weight on arm -->
+  <rect x="20" y="9" width="5" height="3" rx="1" fill="#f5a623" transform="rotate(-20 22.5 10.5)"/>
+</svg>
