@@ -40,7 +40,7 @@ jobs:
       - name: Deploy on server
         run: |
           ssh -i ~/.ssh/key -p "${{ secrets.DEPLOY_PORT || 22 }}" \
-            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" <<'EOF'
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" bash <<'EOF'
           set -eu
           cd /opt/myapp
           docker compose pull
